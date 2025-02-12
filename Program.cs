@@ -6,9 +6,9 @@ class Program
     {
         while (true)
         {
-            Data.ReadFile.ReadAllWithIgnore("tempdata5-med fel.txt");
-            Data.ReadFile.ReadAllFromIgnoreToIndoor("ignore2016_05-2017_01.txt");
-            Data.ReadFile.SearchIndoorTemperatureByDate("InneTemperaturer.txt");
+            Data.ReadFile.ReadAllAndCreateFileTempdata("tempdata5-med fel.txt");
+            Data.ReadFile.CreateFileIndoor("Tempdata.txt");
+            Data.ReadFile.CreateFileOutdoor("Tempdata.txt");
             Console.ReadLine();
         }
     }

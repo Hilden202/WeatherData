@@ -6,9 +6,9 @@ namespace WeatherData.Data
     public class ReadFile
     {
         public static string path = "../../../Files/";
-        public static void ReadAllWithIgnore(string fileName)
+        public static void ReadAllAndCreateFileTempdata(string fileName)
         {
-            using (StreamWriter writer = new StreamWriter(path + "ignore2016_05-2017_01.txt"))
+            using (StreamWriter writer = new StreamWriter(path + "Tempdata.txt"))
             {
                 using (StreamReader reader = new StreamReader(path + fileName))
                 {
@@ -20,6 +20,7 @@ namespace WeatherData.Data
                         {
                             //Console.WriteLine(rowCount + " " + line);
                             writer.WriteLine(rowCount + " " + line);
+                            
                         }
                         rowCount++;
                         line = reader.ReadLine();
@@ -28,7 +29,84 @@ namespace WeatherData.Data
             }
         }
 
-        public static void ReadAllFromIgnoreToIndoor(string fileName)
+                public static void ReadAllTest(string fileName)
+        {
+                using (StreamReader reader = new StreamReader(path + fileName))
+                {
+                    string line = reader.ReadLine();
+                    int rowCount = 0;
+                    string currentDate = null;
+                    
+                    double sumTemperature = 0; // avarage day
+                    double sumMoist = 0;
+
+                    double sumDayTemp   //avarage month
+                    double sumDayHumidity
+                    int count = null;
+                
+                    
+
+                    while (!reader.EndOfStream)
+                    {
+                        if (!Regex.IsMatch(line, @"^(2016-(0[6-9]|1[0-2])|2016-05-(3[1])|2017-01-(0[1-9]|10))\s"))
+                        {
+                            Regex regex = new Regex(@"(\d{4})-(\d{2})-(\d{2}))")
+                            
+
+
+                            string line = reader.ReadLine();
+                            Match match = regex.Match(line);
+
+                            if (match.Success)
+                            {
+                                string year = match.Groups[1].Value;
+                                string month = match.Groups[2].Value;
+                                string day = match.Groups[3].Value;
+                                
+                                float temperature = ExtractTemperature(line);
+                                int humidity = ExtractHumidity(line);
+                            
+                            if (currentDate == null)
+                            {
+                                    currentDate = date;
+                            }
+
+                            if (date != currentDate)
+                            {
+                                double aveDayTemp = sumTemperature / count;
+                                double aveDayHumidity = humidity / count;
+
+                                sumDayHumidity += aveDayHumidity;
+                                sumDayTemp += aveDayTemp;
+
+                                currrentDate = date;
+                                sumTemperature = 0;
+                                sumHumidity = 0;
+                                count = 0;
+
+                                 double moldRisk = (aveDayHumidity - 78) * (aveDayTemp / 15) / 0.22;
+
+                                string riskLevel = moldRisk > 59 ? "High Risk of mold" : "Low Risk of mold";
+                            }
+                            sumTemperature += temp;
+                            sumHumidity += humidity;
+                            count ++;
+                        }
+                           
+                    }
+                            
+               }
+               if (count == 0)
+               {
+                
+               }
+                        rowCount++;
+                        line = reader.ReadLine();
+                    }
+                }
+        }
+
+        public static void CreateFileIndoor(string fileName)
         {
             using (StreamWriter writer = new StreamWriter(path + "InneTemperaturer.txt"))
             {
@@ -50,49 +128,48 @@ namespace WeatherData.Data
             }
         }
 
-        public static void SearchIndoorTemperatureByDate(string fileName)
+        public static void CreateFileOutdoor(string fileName)
         {
-            using (StreamReader reader = new StreamReader(path + fileName))
+            using (StreamWriter writer = new StreamWriter(path + "UteTemperaturer.txt"))
             {
-                Console.Write("Sök på ett datum för att kolla inomhus medeltemperatur: ");
-                string datum = Console.ReadLine();
-
-                if (Regex.IsMatch(datum, @"^(2016-(0[6-9]|1[0-2])|2016-05-(3[1])|2017-01-(0[1-9]|10))[-/]\d{2}[-/]\d{2}$"))
+                using (StreamReader reader = new StreamReader(path + fileName))
                 {
-                    Console.WriteLine("Ogiltigt datumformat. Försök igen med formatet 'YYYY-MM-DD' eller 'YYYY/MM/DD'.");
-                    return;
-                }
-
-                string line;
-                double totalTemperature = 0;
-                int temperatureCount = 0;
-
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (line.Contains(datum))  // Kontrollera om raden innehåller det angivna datumet
+                    string line = reader.ReadLine();
+                    int rowCount = 0;
+                    while (line != null)
                     {
-                        var match = Regex.Match(line, @"Inomhus temperatur:\s*(-?\d+(\.\d+)?)\s*°C");
-                        if (match.Success)
+                        if (Regex.IsMatch(line, @"\bUte\b"))
                         {
-                            double temperature = double.Parse(match.Groups[1].Value);
-                            totalTemperature += temperature;
-                            temperatureCount++;
+                            // Console.WriteLine(rowCount + " " + line);
+                            writer.WriteLine(rowCount + " " + line);
                         }
+                        rowCount++;
+                        line = reader.ReadLine();
                     }
-                }
-
-                if (temperatureCount > 0)
-                {
-                    double averageTemperature = totalTemperature / temperatureCount;
-                    Console.WriteLine("Medeltemperaturen för " + datum + " är " + averageTemperature + "°C");
-                }
-                else
-                {
-                    Console.WriteLine("Inga temperaturer funna för " + datum + ".");
                 }
             }
         }
+        static float ExtractTemperature(string line)
+{
+    Match match = Regex.Match(line, @"\d+\.\d{1}");
+
+            if (match.Success && float.TryParse(match.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float temp))
+    {
+        return temp;
     }
+
+    return 0;
 }
 
+static int ExtractHumidity(string line)
+{
+    Match match = Regex.Match(line, @"\d{2}$");
+    return match.Success ? int.Parse(match.Value) : 0;
+}
+static float ExtractAvarageTemp(string line)
+{
+   
+}
 
+    }
+}
