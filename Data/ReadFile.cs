@@ -20,7 +20,7 @@ namespace WeatherData.Data
                         {
                             //Console.WriteLine(rowCount + " " + line);
                             writer.WriteLine(rowCount + " " + line);
-                            
+
                         }
                         rowCount++;
                         line = reader.ReadLine();
@@ -29,148 +29,148 @@ namespace WeatherData.Data
             }
         }
 
-                public static void ReadAllTest(string fileName)
+        public static void ReadAllTest(string fileName)
         {
-                using (StreamReader reader = new StreamReader(path + fileName))
+            using (StreamReader reader = new StreamReader(path + fileName))
+            {
+                string lines = reader.ReadLine();
+                int rowCount = 0;
+                string currentDay = null;
+
+                double sumTemperature = 0; // avarage day
+                double sumMoist = 0;
+
+                double sumDayTemp = 0;   //avarage month
+                double sumDayHumidity = 0;
+                int count = 0;
+
+
+
+                while (!reader.EndOfStream)
                 {
-                    string line = reader.ReadLine();
-                    int rowCount = 0;
-                    string currentDate = null;
-                    
-                    double sumTemperature = 0; // avarage day
-                    double sumMoist = 0;
-
-                    double sumDayTemp   //avarage month
-                    double sumDayHumidity
-                    int count = null;
-                
-                    
-
-                    while (!reader.EndOfStream)
+                    if (!Regex.IsMatch(lines, @"^(2016-(0[6-9]|1[0-2])|2016-05-(3[1])|2017-01-(0[1-9]|10))\s"))
                     {
-                        if (!Regex.IsMatch(line, @"^(2016-(0[6-9]|1[0-2])|2016-05-(3[1])|2017-01-(0[1-9]|10))\s"))
+                        Regex regex = new Regex(@"(\d{4})-(\d{2})-(\d{2})");
+
+
+
+                        string line = reader.ReadLine();
+                        Match match = regex.Match(line);
+
+                        if (match.Success)
                         {
-                            Regex regex = new Regex(@"(\d{4})-(\d{2})-(\d{2})");
-                            
+                            string year = match.Groups[1].Value; // Om vi ska rakna flera ar
+                            string month = match.Groups[2].Value;
+                            string day = match.Groups[3].Value;
 
+                            float temperature = ExtractTemperature(line);
+                            int humidity = ExtractHumidity(line);
 
-                            string line = reader.ReadLine();
-                            Match match = regex.Match(line);
-
-                            if (match.Success)
+                            if (currentDay == null)
                             {
-                                string year = match.Groups[1].Value; // Om vi ska räkna flera år
-                                string month = match.Groups[2].Value;
-                                string day = match.Groups[3].Value;
+                                currentDay = day;
+                            }
 
-                                float temperature = ExtractTemperature(line);
-                                int humidity = ExtractHumidity(line);
-                            
-                                if (currentDate == null)
-                                {
-                                    currentDate = date;
-                                }
+                            if (day != currentDay)
+                            {
+                                double aveDayTemp = sumTemperature / count;
+                                double aveDayHumidity = humidity / count;
 
-                                if (date != currentDate)
-                                {
-                                    double aveDayTemp = sumTemperature / count;
-                                    double aveDayHumidity = humidity / count;
+                                sumDayHumidity += aveDayHumidity;
+                                sumDayTemp += aveDayTemp;
 
-                                    sumDayHumidity += aveDayHumidity;
-                                    sumDayTemp += aveDayTemp;
+                                currentDay = day;
+                                sumTemperature = 0;
+                                sumHumidity = 0;
+                                count = 0;
 
-                                    currrentDate = date;
-                                    sumTemperature = 0;
-                                    sumHumidity = 0;
-                                    count = 0;
+                                double moldRisk = (aveDayHumidity - 78) * (aveDayTemp / 15) / 0.22;
 
-                                    double moldRisk = (aveDayHumidity - 78) * (aveDayTemp / 15) / 0.22;
+                                string riskLevel = moldRisk > 59 ? "High Risk of mold" : "Low Risk of mold";
+                            }
 
-                                    string riskLevel = moldRisk > 59 ? "High Risk of mold" : "Low Risk of mold";
-                                }
-                                
                             sumTemperature += temp;
                             sumHumidity += humidity;
-                            count ++;
+                            count++;
                         }
-                           
-                    }
-                            
-               }
-               if (count == 0)
-               {
-                
-               }
-                        rowCount++;
-                        line = reader.ReadLine();
-                    }
-                }
-        }
 
-        public static void CreateFileIndoor(string fileName)
-        {
-            using (StreamWriter writer = new StreamWriter(path + "InneTemperaturer.txt"))
-            {
-                using (StreamReader reader = new StreamReader(path + fileName))
-                {
-                    string line = reader.ReadLine();
-                    int rowCount = 0;
-                    while (line != null)
-                    {
-                        if (Regex.IsMatch(line, @"\bInne\b"))
-                        {
-                            //Console.WriteLine(rowCount + " " + line);
-                            writer.WriteLine(rowCount + " " + line);
-                        }
-                        rowCount++;
-                        line = reader.ReadLine();
                     }
+
                 }
+                if (count == 0)
+                {
+
+                }
+                rowCount++;
+                line = reader.ReadLine();
             }
         }
+    }
 
-        public static void CreateFileOutdoor(string fileName)
-        {
-            using (StreamWriter writer = new StreamWriter(path + "UteTemperaturer.txt"))
-            {
-                using (StreamReader reader = new StreamReader(path + fileName))
-                {
-                    string line = reader.ReadLine();
-                    int rowCount = 0;
-                    while (line != null)
-                    {
-                        if (Regex.IsMatch(line, @"\bUte\b"))
-                        {
-                            // Console.WriteLine(rowCount + " " + line);
-                            writer.WriteLine(rowCount + " " + line);
-                        }
-                        rowCount++;
-                        line = reader.ReadLine();
-                    }
-                }
-            }
-        }
-        static float ExtractTemperature(string line)
-{
-    Match match = Regex.Match(line, @"\d+\.\d{1}");
-
-            if (match.Success && float.TryParse(match.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float temp))
+    public static void CreateFileIndoor(string fileName)
     {
-        return temp;
+        using (StreamWriter writer = new StreamWriter(path + "InneTemperaturer.txt"))
+        {
+            using (StreamReader reader = new StreamReader(path + fileName))
+            {
+                string line = reader.ReadLine();
+                int rowCount = 0;
+                while (line != null)
+                {
+                    if (Regex.IsMatch(line, @"\bInne\b"))
+                    {
+                        //Console.WriteLine(rowCount + " " + line);
+                        writer.WriteLine(rowCount + " " + line);
+                    }
+                    rowCount++;
+                    line = reader.ReadLine();
+                }
+            }
+        }
     }
 
-    return 0;
-}
+    public static void CreateFileOutdoor(string fileName)
+    {
+        using (StreamWriter writer = new StreamWriter(path + "UteTemperaturer.txt"))
+        {
+            using (StreamReader reader = new StreamReader(path + fileName))
+            {
+                string line = reader.ReadLine();
+                int rowCount = 0;
+                while (line != null)
+                {
+                    if (Regex.IsMatch(line, @"\bUte\b"))
+                    {
+                        // Console.WriteLine(rowCount + " " + line);
+                        writer.WriteLine(rowCount + " " + line);
+                    }
+                    rowCount++;
+                    line = reader.ReadLine();
+                }
+            }
+        }
+    }
+    static float ExtractTemperature(string line)
+    {
+        Match match = Regex.Match(line, @"\d+\.\d{1}");
 
-static int ExtractHumidity(string line)
-{
-    Match match = Regex.Match(line, @"\d{2}$");
-    return match.Success ? int.Parse(match.Value) : 0;
-}
-static float ExtractAvarageTemp(string line)
-{
-   
-}
+        if (match.Success && float.TryParse(match.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float temp))
+        {
+            return temp;
+        }
+
+        return 0;
+    }
+
+    static int ExtractHumidity(string line)
+    {
+        Match match = Regex.Match(line, @"\d{2}$");
+        return match.Success ? int.Parse(match.Value) : 0;
+    }
+    static float ExtractAvarageTemp(string line)
+    {
 
     }
+
+}
 }
