@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace WeatherData.Data
 {
@@ -30,82 +31,142 @@ namespace WeatherData.Data
         }
 
         public static void ReadAllTest(string fileName)
+{
+    using (StreamReader reader = new StreamReader(path + fileName))
+    {
+        string lines = reader.ReadLine();
+        int rowCount = 0;
+        string currentDay = null;
+        string currentMonth = null;
+
+        double sumTemperatureInside = 0; // avarage day Inside
+        double sumHumidityInside = 0;
+        
+        double sumDayTempInside = 0;   //avarage month Inside
+        double sumDayHumidityInside = 0;
+
+        //---------------------------------------------------------------
+        double sumTemperatureOutside = 0; // avarage day Outside
+        double sumHumidityOutside = 0;
+
+        double sumDayTempOutside = 0;   //avarage month Outside
+        double sumDayHumidityOutside = 0;
+
+
+        int countInside = 0;
+        int countOutside = 0;
+        int dayCountInside = 0;
+        int dayCountOutside = 0;
+
+
+
+        while (!reader.EndOfStream)
         {
-            using (StreamReader reader = new StreamReader(path + fileName))
+            if (!Regex.IsMatch(lines, @"^(2016-(0[6-9]|1[0-2])|2016-05-(3[1])|2017-01-(0[1-9]|10))\s"))
             {
-                string lines = reader.ReadLine();
-                int rowCount = 0;
-                string currentDay = null;
+                Regex regex = new Regex(@"(\d{4})-(\d{2})-(\d{2}) \d{2}:\d{2}:\d{2},(Ute|Inne),(\d{2}.\d|\d{1}.\d),(\d{2})");
 
-                double sumTemperature = 0; // avarage day
-                double sumMoist = 0;
+                string line = reader.ReadLine();
+                Match match = regex.Match(line);
 
-                double sumDayTemp = 0;   //avarage month
-                double sumDayHumidity = 0;
-                int count = 0;
-
-
-
-                while (!reader.EndOfStream)
+                if (match.Success)
                 {
-                    if (!Regex.IsMatch(lines, @"^(2016-(0[6-9]|1[0-2])|2016-05-(3[1])|2017-01-(0[1-9]|10))\s"))
+                   // string year = match.Groups[1].Value; // Om vi ska rakna flera ar
+                    string month = match.Groups[2].Value;
+                    string day = match.Groups[3].Value;
+                    string location = match.Groups[4].Value;
+                    int temperature = int.Parse(match.Groups[5].Value);
+                    int humidity = int.Parse(match.Groups[6].Value);
+
+                    if (currentDay == null)
                     {
-                        Regex regex = new Regex(@"(\d{4})-(\d{2})-(\d{2})");
+                        currentDay = day;
+                        currentMonth = month;
+                    }
 
-
-
-                        string line = reader.ReadLine();
-                        Match match = regex.Match(line);
-
-                        if (match.Success)
+                    if (day != currentDay)
+                    {
+                        if(location == "Inne")
                         {
-                            string year = match.Groups[1].Value; // Om vi ska rakna flera ar
-                            string month = match.Groups[2].Value;
-                            string day = match.Groups[3].Value;
+                            double aveDayTempInside = sumTemperatureInside / countInside;
+                            double aveDayHumidityInside = sumHumidityInside / countInside;
 
-                            float temperature = ExtractTemperature(line);
-                            int humidity = ExtractHumidity(line);
+                            sumDayHumidityInside += aveDayHumidityInside;
+                            sumDayTempInside += aveDayTempInside;
 
-                            if (currentDay == null)
-                            {
-                                currentDay = day;
-                            }
+                            currentDay = day;
+                            sumTemperatureInside = 0;
+                            sumHumidityInside = 0;
+                            countInside = 0;
+                            dayCountInside++;
+                        }
+                        else if (location == "Ute")
+                        {
+                            double aveDayTempOutside = sumTemperatureOutside / countOutside;
+                            double aveDayHumidityOutside = sumHumidityOutside / countOutside;
 
-                            if (day != currentDay)
-                            {
-                                double aveDayTemp = sumTemperature / count;
-                                double aveDayHumidity = humidity / count;
+                            sumDayHumidityOutside += aveDayHumidityOutside;
+                            sumDayTempOutside += aveDayTempOutside;
 
-                                sumDayHumidity += aveDayHumidity;
-                                sumDayTemp += aveDayTemp;
+                            currentDay = day;
+                            sumTemperatureOutside = 0;
+                            sumHumidityOutside = 0;
+                            countOutside = 0;
+                            dayCountOutside++;
+                        }
 
-                                currentDay = day;
-                                sumTemperature = 0;
-                                sumHumidity = 0;
-                                count = 0;
 
-                                double moldRisk = (aveDayHumidity - 78) * (aveDayTemp / 15) / 0.22;
 
-                                string riskLevel = moldRisk > 59 ? "High Risk of mold" : "Low Risk of mold";
-                            }
+                    }
+                    if (month != currentMonth)
+                    {
+                        if(location == "Inne")
+                        {
+                            double aveMonthTempInside = sumDayTempInside / dayCountInside;
+                            double aveMonthHumidityInside = sumDayHumidityInside / dayCountInside;
 
-                            sumTemperature += temp;
-                            sumHumidity += humidity;
-                            count++;
+                            CalculateMoldRisk(aveMonthHumidityInside, aveMonthTempInside);
+
+                            sumDayTempInside = 0;
+                            sumDayHumidityInside = 0;
+                            dayCountInside = 0;
+                        }
+                        else if (location == "Ute")
+                        {
+                            double aveMonthTempOutside = sumDayTempOutside / dayCountOutside;
+                            double aveMonthHumidityOutside = sumDayHumidityOutside / dayCountOutside;
+
+                            string moldRisk = CalculateMoldRisk(aveMonthHumidityOutside, aveMonthTempOutside);
+
+                            sumDayTempOutside = 0;
+                            sumDayHumidityOutside = 0;
+                            dayCountOutside = 0;
                         }
 
                     }
+                    if (location == "Ute")
+                    {
+                        sumTemperatureOutside += temperature;
+                        sumHumidityOutside += humidity;
+                        countOutside++;
+                    }
+                    else if (location == "Inne")
+                    {
+                        sumTemperatureInside += temperature;
+                        sumHumidityInside += humidity;
+                        countInside++;
+                    }
 
                 }
-                if (count == 0)
-                {
 
-                }
-                rowCount++;
-                line = reader.ReadLine();
             }
+
         }
+      
+        rowCount++;
+        lines = reader.ReadLine();
     }
+}
 
     public static void CreateFileIndoor(string fileName)
     {
@@ -150,6 +211,103 @@ namespace WeatherData.Data
             }
         }
     }
+            public static void SearchOutdoorTempAndHumidityByDate(string fileName)
+        {
+            using (StreamReader reader = new StreamReader(path + fileName))
+            {
+                Console.Write("Sök på ett datum för att kolla medeltemperatur och luftfuktighet den dagen: ");
+                string datum = Console.ReadLine();
+
+                if (!Regex.IsMatch(datum, @"\d{4}[-/]\d{2}[-/]\d{2}"))
+                {
+                    Console.WriteLine("Ogiltigt datumformat. Försök igen med formatet 'YYYY-MM-DD' eller 'YYYY/MM/DD'.");
+                    return;
+                }
+
+                string line;
+                double totalTemperature = 0;
+                double totalHumidity = 0;
+                int recordCount = 0;
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Contains(datum))
+                    {
+                        var tempMatch = Regex.Match(line, @"(\d+\.\d+)"); // Matcher temperatur, t.ex. 19.4
+                                                                          
+                        var humidityMatch = Regex.Match(line, @"(\d+)$"); // Matcher sista siffran som luftfuktighet, t.ex. 35
+
+                        if (tempMatch.Success && humidityMatch.Success)
+                        {
+                            double temperature = double.Parse(tempMatch.Groups[1].Value);
+                            double humidity = double.Parse(humidityMatch.Groups[1].Value);
+
+                            totalTemperature += temperature;
+                            totalHumidity += humidity;
+                            recordCount++;
+                        }
+                    }
+                }
+
+                if (recordCount > 0)
+                {
+                    double averageTemperature = totalTemperature / recordCount;
+                    double averageHumidity = totalHumidity / recordCount;
+
+                    Console.WriteLine("Medeltemperaturen för " + datum + " är " + averageTemperature.ToString("0.0") + "°C och luftfuktigheten är " + averageHumidity.ToString("0") + "%.");
+                }
+                else
+                {
+                    Console.WriteLine("Inga temperaturer eller luftfuktighet funna för " + datum + ".");
+                }
+            }
+        }
+                public static void SearchAvarageIndoorTempByDate(string fileName)
+        {
+            using (StreamReader reader = new StreamReader(path + fileName))
+            {
+                Console.Write("Sök på ett datum för att kolla medeltemperatur innomhus den dagen: ");
+                string datum = Console.ReadLine();
+
+                if (!Regex.IsMatch(datum, @"\d{4}[-/]\d{2}[-/]\d{2}"))
+                {
+                    Console.WriteLine("Ogiltigt datumformat. Försök igen med formatet 'YYYY-MM-DD' eller 'YYYY/MM/DD'.");
+                    return;
+                }
+
+                string line;
+                double totalTemperature = 0;
+                int recordCount = 0;
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Contains(datum))
+                    {
+                        var tempMatch = Regex.Match(line, @"(\d+\.\d+)");
+
+
+                        if (tempMatch.Success)
+                        {
+                            double temperature = double.Parse(tempMatch.Groups[1].Value);
+
+                            totalTemperature += temperature;
+                            recordCount++;
+                        }
+                    }
+                }
+
+                if (recordCount > 0)
+                {
+                    double averageTemperature = totalTemperature / recordCount;
+
+                    Console.WriteLine("Medeltemperaturen för " + datum + " är " + averageTemperature.ToString("0.0"));
+                }
+                else
+                {
+                    Console.WriteLine("Inga temperaturer funna för " + datum + ".");
+                }
+            }
+        }
     static float ExtractTemperature(string line)
     {
         Match match = Regex.Match(line, @"\d+\.\d{1}");
