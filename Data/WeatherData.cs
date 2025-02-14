@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace WeatherData
+namespace WeatherData.Data
 {
     public class WeatherData
     {
@@ -91,7 +91,7 @@ namespace WeatherData
             }
         }
 
-                public static List<WeatherData> SearchWeatherData(List<WeatherData> weatherList, bool includeDay)
+        public static List<WeatherData> SearchWeatherData(List<WeatherData> weatherList, bool includeDay)
         {
             int year, month, day = 1; // Default day = 1 in case user only wants year + month
 
