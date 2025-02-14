@@ -29,6 +29,53 @@ namespace WeatherData.Data
                 }
             }
         }
+        public static void SeasonStarted(string fileName, string season)
+        {
+            double temperatureThreshold = 0.0;
+            if (season == "Höst")
+            {
+                temperatureThreshold = 10.0;
+            }
+            if (season == "Vinter")
+            {
+                temperatureThreshold = 0.0;
+            }
+            List<string> list = new List<string>();
+            using (StreamReader reader = new StreamReader(path + fileName))
+            {
+                string pattern = @"(\d{4}-\d{2}-\d{2}): (-{0,1}\d{1,2}.\d)";
+                string line = reader.ReadLine();
+                int daysOfSeason = 0;
+                while (line != null)
+                {
+                    foreach (Match m in Regex.Matches(line, pattern))
+                    {
+                        if (m.Success)
+                        {
+                            list.Add(m.Groups[1].Value.ToString() + " med temperaturen " + m.Groups[2].Value.ToString());
+                            DateOnly date = DateOnly.Parse(m.Groups[1].ToString());
+                            DateOnly earliestAutumn = new DateOnly(2016, 08, 01);
+                            if (double.Parse(m.Groups[2].Value.ToString().Replace('.', ',')) < temperatureThreshold && date.CompareTo(earliestAutumn) >= 0)
+                            {
+                                daysOfSeason++;
+                                if (daysOfSeason == 5)
+                                {
+                                    Console.WriteLine(date);
+                                    Console.WriteLine($"{season} började " + list[list.Count - 5]);
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                daysOfSeason = 0;
+                            }
+                        }
+                    }
+                    line = reader.ReadLine();
+                }
+                Console.WriteLine($"{season} har inte börjat inom intervallen");
+            }
+        }
         public static void SortDataBy(string fileName, string pattern, bool IsTemp)
         {
             //string temperaturePattern = @"(\d{4}-\d{2}-\d{2}).*((?<=,)\d{1,2}.\d)";
@@ -45,7 +92,7 @@ namespace WeatherData.Data
                     {
                         if (m.Success)
                         {
-                            double temperature = double.Parse(m.Groups[2].Value, CultureInfo.InvariantCulture);
+                            double temperature = double.Parse(m.Groups[2].Value.ToString(), CultureInfo.InvariantCulture);
                             string date = m.Groups[1].Value.ToString();
                             // Group[2] is the temperature, Group[1] is the date
                             //list.Add(m.Groups[2].Value.ToString() + "\t\t" + m.Groups[1].Value.ToString());
@@ -58,6 +105,7 @@ namespace WeatherData.Data
             //list.Sort(); // Sort list 
             list.Sort((a, b) => a.Item1.CompareTo(b.Item1));
             // If sorted by temperature
+            Console.Clear();
             if (IsTemp)
             {
                 Console.WriteLine("Temperatur\tDatum");
@@ -73,11 +121,13 @@ namespace WeatherData.Data
             //{
             //    Console.WriteLine(line);
             //}
+
+            //Console.WriteLine(line);
             foreach (var entry in list)
             {
-                //Console.WriteLine(line);
                 Console.WriteLine(entry.Item1.ToString("0.0", CultureInfo.InvariantCulture) + "\t\t" + entry.Item2);
             }
+
         }
 
         public static void ReadAllTest(string filePath, List<WeatherData> weatherList)
@@ -211,7 +261,25 @@ namespace WeatherData.Data
                 lines = reader.ReadLine();
             }
         }
+        public static string CalculateMoldRisk(double humidity, double temp)
+        {
 
+
+            double moldRisk = (humidity - 78) * (temp / 15) / 0.22;
+
+            if (humidity < 78)
+            {
+                return "Humidity is below requirement for mold to grow." + moldRisk;
+            }
+            else if (temp < 15)
+            {
+                return "Temperature is below requirement for mold to grow." + moldRisk;
+            }
+
+            string riskLevel = moldRisk > 50 ? "High Risk of mold" + moldRisk : "Low Risk of mold" + moldRisk;
+
+            return riskLevel;
+        }
         public static void CreateFileIndoor(string fileName)
         {
             using (StreamWriter writer = new StreamWriter(path + "InneTemperaturer.txt"))
@@ -291,7 +359,49 @@ namespace WeatherData.Data
                     string date = entry.Key;
                     double averageTemp = entry.Value.Average();
 
-                    string result = date + ": " + averageTemp.ToString("0.0");
+                    string result = date + ": " + averageTemp.ToString("0.0", CultureInfo.InvariantCulture);
+
+                    //Console.WriteLine(result);
+                    writer.WriteLine(result);
+                }
+            }
+        }
+        public static void CreateFileAverageHumOutside(string fileName)
+        {
+            string inputFile = Path.Combine(path, fileName);
+            string outputFile = Path.Combine(path, "AverageFuktUte.txt");
+
+            Dictionary<string, List<double>> dailyHumidity = new Dictionary<string, List<double>>();
+
+            using (StreamReader reader = new StreamReader(inputFile))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    var match = Regex.Match(line, @"(\d{4}-\d{2}-\d{2}).*?\d+\.\d+\D+(\d+\.\d+)");
+
+                    if (match.Success)
+                    {
+                        string date = match.Groups[1].Value;
+                        double humidity = double.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
+
+                        if (!dailyHumidity.ContainsKey(date))
+                        {
+                            dailyHumidity[date] = new List<double>();
+                        }
+                        dailyHumidity[date].Add(humidity);
+                    }
+                }
+            }
+
+            using (StreamWriter writer = new StreamWriter(outputFile))
+            {
+                foreach (var entry in dailyHumidity)
+                {
+                    string date = entry.Key;
+                    double averageHum = entry.Value.Average();
+
+                    string result = date + ": " + averageHum.ToString("0.0", CultureInfo.InvariantCulture);
 
                     //Console.WriteLine(result);
                     writer.WriteLine(result);

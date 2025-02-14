@@ -10,6 +10,7 @@
   <ItemGroup>
     <None Remove="Files\" />
     <None Remove="Data\" />
+    <None Remove="Files\InneTemperaturer.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Files\" />
