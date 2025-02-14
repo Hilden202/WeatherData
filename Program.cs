@@ -37,7 +37,9 @@ class Program
             {
                 case ConsoleKey.T:
                     Console.Clear();
-
+                    bool includeDay = true;
+                    //DateOnly = Helpers.SearchDate(includeDay);
+                    
                     Data.ReadFile.SearchOutdoorTempAndHumidityByDate("UteTemperaturer.txt");
                     break;
                 case ConsoleKey.I:

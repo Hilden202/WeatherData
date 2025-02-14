@@ -46,6 +46,8 @@ namespace WeatherData.Data
                 string pattern = @"(\d{4}-\d{2}-\d{2}): (-{0,1}\d{1,2}.\d)";
                 string line = reader.ReadLine();
                 int daysOfSeason = 0;
+                int highestConsecutive = 0;
+                int closestDay = 0;
                 while (line != null)
                 {
                     foreach (Match m in Regex.Matches(line, pattern))
@@ -58,6 +60,11 @@ namespace WeatherData.Data
                             if (double.Parse(m.Groups[2].Value.ToString().Replace('.', ',')) < temperatureThreshold && date.CompareTo(earliestAutumn) >= 0)
                             {
                                 daysOfSeason++;
+                                if (daysOfSeason > highestConsecutive)
+                                {
+                                    highestConsecutive = daysOfSeason;
+                                    closestDay = list.Count;
+                                }
                                 if (daysOfSeason == 5)
                                 {
                                     Console.WriteLine(date);
@@ -73,7 +80,7 @@ namespace WeatherData.Data
                     }
                     line = reader.ReadLine();
                 }
-                Console.WriteLine($"{season} har inte börjat inom intervallen");
+                Console.WriteLine($"{season} har inte börjat inom intervallen, närmast var " + list[closestDay]);
             }
         }
         public static void SortDataBy(string fileName, string pattern, bool IsTemp)
