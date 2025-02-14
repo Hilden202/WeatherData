@@ -90,5 +90,72 @@ namespace WeatherData
                 Console.WriteLine("");
             }
         }
+
+                public static List<WeatherData> SearchWeatherData(List<WeatherData> weatherList, bool includeDay)
+        {
+            int year, month, day = 1; // Default day = 1 in case user only wants year + month
+
+            Console.Clear();
+            Console.SetCursorPosition(85, 8);
+            Console.WriteLine("Enter Year (2016-2017): ");
+            Console.SetCursorPosition(76, 8);
+
+            while (!int.TryParse(Console.ReadLine(), out year) || year < 2016 || year > 2017)
+            {
+                Console.SetCursorPosition(55, 9);
+                Console.WriteLine("Invalid input! Enter a valid Year (2016-2017): ");
+            }
+
+            Console.SetCursorPosition(101, 8);
+            Console.WriteLine("Enter Month (1-12): ");
+            Console.SetCursorPosition(101, 9);
+
+            while (!int.TryParse(Console.ReadLine(), out month) || month < 1 || month > 12)
+            {
+                Console.SetCursorPosition(55, 10);
+                Console.WriteLine("Invalid input! Enter a valid Month (1-12): ");
+            }
+
+            if (includeDay) // If user wants to specify a day
+            {
+                Console.SetCursorPosition(115, 8);
+                Console.WriteLine($"Enter Day (1-{DateTime.DaysInMonth(year, month)}): ");
+                Console.SetCursorPosition(115, 9);
+
+                while (!int.TryParse(Console.ReadLine(), out day) || day < 1 || day > DateTime.DaysInMonth(year, month))
+                {
+                    Console.SetCursorPosition(55, 10);
+                    Console.WriteLine($"Invalid input! Enter a valid Day (1-{DateTime.DaysInMonth(year, month)}): ");
+                }
+            }
+
+            DateOnly searchDate = new DateOnly(year, month, day);
+
+            // Search in list
+            List<WeatherData> results;
+            if (includeDay)
+            {
+                results = weatherList.Where(w => w.Date == searchDate).ToList(); // Exact match
+            }
+            else
+            {
+                results = weatherList.Where(w => w.Date.Year == year && w.Date.Month == month).ToList(); // All from month
+            }
+
+            if (results.Count == 0)
+            {
+                Console.WriteLine("No matching records found.");
+            }
+            else
+            {
+                foreach (var data in results)
+                {
+                    Console.WriteLine($"Date: {data.Date}, Temp: {data.AveTemp}, Humidity: {data.AveHumidity}, Risk: {data.RiskOfMold}, Location: {data.Location}");
+                    Console.WriteLine();
+                }
+            }
+
+            return results;
+        }
     }
 }

@@ -83,8 +83,9 @@ namespace WeatherData.Data
                 Console.WriteLine($"{season} har inte börjat inom intervallen, närmast var " + list[closestDay]);
             }
         }
-        public static void SortDataBy(string fileName, string pattern, bool IsTemp)
+        public static void SortDataBy(string fileName, bool IsTemp)
         {
+            string pattern = @"(\d{4}-\d{2}-\d{2}): (-{0,1}\d{1,2}.\d)";
             //string temperaturePattern = @"(\d{4}-\d{2}-\d{2}).*((?<=,)\d{1,2}.\d)";
             //string humidityPattern = @"(\d{4}-\d{2}-\d{2}).*((?<=,)\d{1,2})";
             //List<string> list = new List<string>(); 
@@ -124,12 +125,6 @@ namespace WeatherData.Data
                 Console.WriteLine("Luftfuktighet\tDatum");
             }
             // Write sorted data
-            //foreach (var line in list)
-            //{
-            //    Console.WriteLine(line);
-            //}
-
-            //Console.WriteLine(line);
             foreach (var entry in list)
             {
                 Console.WriteLine(entry.Item1.ToString("0.0", CultureInfo.InvariantCulture) + "\t\t" + entry.Item2);
@@ -385,7 +380,9 @@ namespace WeatherData.Data
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    var match = Regex.Match(line, @"(\d{4}-\d{2}-\d{2}).*?\d+\.\d+\D+(\d+\.\d+)");
+                    string test = @"(\d{4}-\d{2}-\d{2}).*((?<=,)\d{1,2})";
+                    //var match = Regex.Match(line, @"(\d{4}-\d{2}-\d{2}).*?\d+\.\d+\D+(\d+\.\d+)");
+                    var match = Regex.Match(line, test);
 
                     if (match.Success)
                     {

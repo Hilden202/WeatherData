@@ -16,9 +16,6 @@ class Program
                                                                            //Data.ReadFile.CreateFileAverageTempInside("InneTemperaturer.txt"); // Skapar en fil med medelvärde av InneTemperaturer.
                                                                            //Data.ReadFile.CreateFileAverageHumInside("InneTemperaturer.txt"); // Skapar en fil med medelvärde av InneTemperaturer.txt
 
-        string temperaturePattern = @"(\d{4}-\d{2}-\d{2}): (-{0,1}\d{1,2}.\d)";
-        // string temperaturePattern = @"(\d{4}-\d{2}-\d{2}):\s*(-?\d+\.\d+)";
-        string humidityPattern = @"(\d{4}-\d{2}-\d{2}).*((?<=,)\d{1,2})";
 
         while (true)
         {
@@ -36,16 +33,23 @@ class Program
             switch (key.Key)
             {
                 case ConsoleKey.T:
-                    Console.Clear();
-                    bool includeDay = true;
-                    //DateOnly = Helpers.SearchDate(includeDay);
-                    
-                    Data.ReadFile.SearchOutdoorTempAndHumidityByDate("UteTemperaturer.txt");
-                    break;
-                case ConsoleKey.I:
-                    Console.Clear();
-                    Data.ReadFile.SearchAvarageIndoorTempByDate("InneTemperaturer.txt");
-                    break;
+    {
+        Console.Clear();
+        bool includeDay = true;
+
+        List<WeatherData> monthResults = WeatherData.SearchWeatherData(weatherList, true);
+
+        break;
+    }
+case ConsoleKey.I:
+    {
+        Console.Clear();
+        bool includeDay = false;
+
+        List<WeatherData> monthResults = WeatherData.SearchWeatherData(weatherList, false);
+
+        break;
+    }
                 case ConsoleKey.S:
                     Console.Clear();
                     Console.WriteLine("Välj ett alternativ:");
@@ -58,11 +62,11 @@ class Program
                     {
                         case ConsoleKey.D1:
                             Console.Clear();
-                            Data.ReadFile.SortDataBy("AverageTemperaturerUte.txt", temperaturePattern, true);
+                            Data.ReadFile.SortDataBy("AverageTemperaturerUte.txt", true);
                             break;
                         case ConsoleKey.D2:
                             Console.Clear();
-                            Data.ReadFile.SortDataBy("AverageFuktUte.txt", humidityPattern, false);
+                            Data.ReadFile.SortDataBy("AverageFuktUte.txt", false);
                             break;
                     }
                     break;
