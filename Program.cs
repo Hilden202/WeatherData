@@ -21,11 +21,12 @@ using Data;
                 Console.WriteLine("Problem med fil: " + ex.Message);
             }
             Data.ReadFile.CreateFileOutdoor("Tempdata.txt"); // Skapar en fil med utetemperaturer från Tempdata.txt
-            Data.ReadFile.CreateFileAverageTempOutside("UteTemperaturer.txt"); // Skapar en fil AvergageTemperaturUte.txt med medelvärde från UteTemperaturer.txt
-            Data.ReadFile.CreateFileAverageHumOutside("UteTemperaturer.txt"); // Skapar en fil AvergageFuktUte.txt med medelvärde av UteTemperaturer.txt
+            Data.ReadFile.CreateFileAverageTemp("UteTemperaturer.txt", "AverageTemperaturerUte.txt"); // Skapar en fil AvergageTemperaturUte.txt med medelvärde från UteTemperaturer.txt
+            Data.ReadFile.CreateFileAverageHum("UteTemperaturer.txt", "AverageFuktUte.txt"); // Skapar en fil AvergageFuktUte.txt med medelvärde av UteTemperaturer.txt
                                                                               //Data.ReadFile.CreateFileAverageTempInside("InneTemperaturer.txt"); // Skapar en fil med medelvärde av InneTemperaturer.
                                                                               //Data.ReadFile.CreateFileAverageHumInside("InneTemperaturer.txt"); // Skapar en fil med medelvärde av InneTemperaturer.txt
-
+            Data.ReadFile.CreateFileAverageTemp("InneTemperaturer.txt", "AverageTemperaturerInne.txt");
+            Data.ReadFile.CreateFileAverageHum("InneTemperaturer.txt", "AverageFuktInne.txt");
 
             while (true)
             {
@@ -63,8 +64,10 @@ using Data;
                     case ConsoleKey.S:
                         Console.Clear();
                         Console.WriteLine("Välj ett alternativ:");
-                        Console.WriteLine("1. Sortera temperaturer i fallande ordning.");
-                        Console.WriteLine("2. Sortera luftfuktighet i stigande ordning.");
+                        Console.WriteLine("1. Sortera temperaturer (UTE) i fallande ordning.");
+                        Console.WriteLine("2. Sortera luftfuktighet (UTE) i stigande ordning.");
+                        Console.WriteLine("3. Sortera temperaturer (INNE) i fallande ordning.");
+                        Console.WriteLine("4. Sortera luftfuktighet (INNE) i stigande ordning.");
 
                         var key2 = Console.ReadKey(true);
 
@@ -77,6 +80,14 @@ using Data;
                             case ConsoleKey.D2:
                                 Console.Clear();
                                 Data.ReadFile.SortDataBy("AverageFuktUte.txt", false);
+                                break;
+                            case ConsoleKey.D3:
+                                Console.Clear();
+                                Data.ReadFile.SortDataBy("AverageTemperaturerInne.txt", true);
+                                break;
+                            case ConsoleKey.D4:
+                                Console.Clear();
+                                Data.ReadFile.SortDataBy("AverageFuktInne.txt", false);
                                 break;
                         }
                         break;

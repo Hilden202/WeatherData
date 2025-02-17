@@ -331,10 +331,10 @@ namespace WeatherData.Data
                 }
             }
         }
-        public static void CreateFileAverageTempOutside(string fileName)
+        public static void CreateFileAverageTemp(string fileName, string outputFileName)
         {
             string inputFile = Path.Combine(path, fileName);
-            string outputFile = Path.Combine(path, "AverageTemperaturerUte.txt");
+            string outputFile = Path.Combine(path, outputFileName);
 
             Dictionary<string, List<double>> dailyTemperatures = new Dictionary<string, List<double>>();
 
@@ -373,10 +373,10 @@ namespace WeatherData.Data
                 }
             }
         }
-        public static void CreateFileAverageHumOutside(string fileName)
+        public static void CreateFileAverageHum(string fileName, string outputFileName)
         {
             string inputFile = Path.Combine(path, fileName);
-            string outputFile = Path.Combine(path, "AverageFuktUte.txt");
+            string outputFile = Path.Combine(path, outputFileName);
 
             Dictionary<string, List<double>> dailyHumidity = new Dictionary<string, List<double>>();
 
