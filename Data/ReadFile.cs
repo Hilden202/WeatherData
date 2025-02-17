@@ -54,7 +54,7 @@ namespace WeatherData.Data
                     {
                         if (m.Success)
                         {
-                            list.Add(m.Groups[1].Value.ToString() + " med temperaturen " + m.Groups[2].Value.ToString());
+                            list.Add(m.Groups[1].Value.ToString() + " med temperaturen " + m.Groups[2].Value.ToString().TemperatureString());
                             DateOnly date = DateOnly.Parse(m.Groups[1].ToString());
                             DateOnly earliestAutumn = new DateOnly(2016, 08, 01);
                             if (double.Parse(m.Groups[2].Value.ToString().Replace('.', ',')) < temperatureThreshold && date.CompareTo(earliestAutumn) >= 0)
@@ -68,7 +68,7 @@ namespace WeatherData.Data
                                 if (daysOfSeason == 5)
                                 {
                                     Console.WriteLine(date);
-                                    Console.WriteLine($"{season} började " + list[list.Count - 5]);
+                                    Console.WriteLine($"{season} började {date} med {daysOfSeason} efterföljande dagar med medeltemperatur under {temperatureThreshold.ToString().TemperatureString()}");
                                     return;
                                 }
                             }
@@ -80,7 +80,7 @@ namespace WeatherData.Data
                     }
                     line = reader.ReadLine();
                 }
-                Console.WriteLine($"{season} har inte börjat inom intervallen, närmast var " + list[closestDay]);
+                Console.WriteLine($"{season} har inte börjat inom intervallen, närmast var {list[closestDay]} efter {highestConsecutive} dagar med medeltemperatur under {temperatureThreshold.ToString().TemperatureString()}");
             }
         }
         public static void SortDataBy(string fileName, bool IsTemp)
