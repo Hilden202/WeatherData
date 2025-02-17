@@ -12,7 +12,14 @@ using Data;
 
 
             Data.ReadFile.ReadAllAndCreateFileTempdata("tempdata5-med fel.txt"); // Skapar en koreekt fil med temperaturdata Tempdata.txt
-            Data.ReadFile.CreateFileIndoor("Tempdata.txt"); // Skapar en fil med innetemperaturer från Tempdata.txt
+            try
+            {
+                Data.ReadFile.CreateFileIndoor("Tempdata.txt"); // Skapar en fil med innetemperaturer från Tempdata.txt
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Problem med fil: " + ex.Message);
+            }
             Data.ReadFile.CreateFileOutdoor("Tempdata.txt"); // Skapar en fil med utetemperaturer från Tempdata.txt
             Data.ReadFile.CreateFileAverageTempOutside("UteTemperaturer.txt"); // Skapar en fil AvergageTemperaturUte.txt med medelvärde från UteTemperaturer.txt
             Data.ReadFile.CreateFileAverageHumOutside("UteTemperaturer.txt"); // Skapar en fil AvergageFuktUte.txt med medelvärde av UteTemperaturer.txt

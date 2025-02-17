@@ -118,17 +118,22 @@ namespace WeatherData.Data
             {
                 Console.WriteLine("Temperatur\tDatum");
                 list.Reverse(); // Reverse list to start with highest value
+                foreach (var entry in list)
+                {
+                    Console.WriteLine(entry.Item1.ToString("0.0", CultureInfo.InvariantCulture).TemperatureString() + "\t\t" + entry.Item2);
+                }
             }
             // If sorted by humidity
             else
             {
                 Console.WriteLine("Luftfuktighet\tDatum");
+                foreach (var entry in list)
+                {
+                    Console.WriteLine(entry.Item1.ToString("0.0", CultureInfo.InvariantCulture) + "%\t\t" + entry.Item2);
+                }
             }
             // Write sorted data
-            foreach (var entry in list)
-            {
-                Console.WriteLine(entry.Item1.ToString("0.0", CultureInfo.InvariantCulture) + "\t\t" + entry.Item2);
-            }
+            
 
         }
 
