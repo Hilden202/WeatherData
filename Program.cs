@@ -1,16 +1,44 @@
-﻿namespace WeatherData;
+﻿using WeatherData.Data;
+namespace WeatherData;
 
 class Program
 {
     static void Main(string[] args)
     {
-        while (true)
+        var weatherManager = ReadFile.ReadWeatherInfo("../../../Files/tempdata5-med fel.txt");
+
+        Console.Clear();
+        Console.WriteLine("Välj ett alternativ:");
+        Console.WriteLine("T. Sök specific dag.");
+        Console.WriteLine("I. Sök specific månad.");
+        Console.WriteLine("M. Meterologisk höst/vinter.");
+        Console.WriteLine("Q. Avsluta.");
+
+        var key = Console.ReadKey(true);
+
+        switch (key.Key)
         {
-            Data.ReadFile.ReadAllAndCreateFileTempdata("tempdata5-med fel.txt");
-            Data.ReadFile.CreateFileIndoor("Tempdata.txt");
-            Data.ReadFile.CreateFileOutdoor("Tempdata.txt");
-            Console.ReadLine();
+            case ConsoleKey.T:
+                {
+                    bool includeDay = true;
+                    Helpers.SearchWeatherData(weatherManager, true);
+                    break;
+                }
+            case ConsoleKey.I:
+                {
+                    bool includeDay = false;
+                    Helpers.SearchWeatherData(weatherManager, false);
+                    break;
+                }
+            case ConsoleKey.M:
+                {
+
+                    break;
+                }
+
         }
+
+
     }
 }
 

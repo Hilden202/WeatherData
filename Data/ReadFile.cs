@@ -1,176 +1,159 @@
-﻿using System;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
+using static WeatherData.Data.WeatherData;
 
 namespace WeatherData.Data
 {
     public class ReadFile
     {
-        public static string path = "../../../Files/";
-        public static void ReadAllAndCreateFileTempdata(string fileName)
+        public static List<WeatherData> ReadWeatherInfo(string filePath)
         {
-            using (StreamWriter writer = new StreamWriter(path + "Tempdata.txt"))
+            var weatherManager = new WeatherDataManager();
+
+
+            using (StreamReader reader = new StreamReader(filePath))
             {
-                using (StreamReader reader = new StreamReader(path + fileName))
-                {
-                    string line = reader.ReadLine();
-                    int rowCount = 0;
-                    while (line != null)
+                string lines;
+
+                string currentDayInside = null;
+                string currentDayOutside = null;
+
+                double sumTemperatureInside = 0; // avarage day Inside
+                double sumHumidityInside = 0;
+
+                //---------------------------------------------------------------
+                double sumTemperatureOutside = 0; // avarage day Outside
+                double sumHumidityOutside = 0;
+
+                int countInside = 0;
+                int countOutside = 0;
+
+                foreach (var line in File.ReadAllLines(filePath))
+                { 
+                    if (!Regex.IsMatch(line, @"^(2016-05-\d{2}|2017-01-\d{2})"))
                     {
-                        if (!Regex.IsMatch(line, @"^(2016-(0[6-9]|1[0-2])|2016-05-(3[1])|2017-01-(0[1-9]|10))\s"))
-                        {
-                            //Console.WriteLine(rowCount + " " + line);
-                            writer.WriteLine(rowCount + " " + line);
+                        Regex regex = new Regex(@"(\d{4})-(\d{2})-(\d{2}) \d{2}:\d{2}:\d{2},(Ute|Inne),(-?\d{1,2}\.\d+),(\d{1,3})");
 
-                        }
-                        rowCount++;
-                        line = reader.ReadLine();
-                    }
-                }
-            }
-        }
-
-        public static void ReadAllTest(string fileName)
-        {
-            using (StreamReader reader = new StreamReader(path + fileName))
-            {
-                string lines = reader.ReadLine();
-                int rowCount = 0;
-                string currentDay = null;
-
-                double sumTemperature = 0; // avarage day
-                double sumMoist = 0;
-
-                double sumDayTemp = 0;   //avarage month
-                double sumDayHumidity = 0;
-                int count = 0;
-
-
-
-                while (!reader.EndOfStream)
-                {
-                    if (!Regex.IsMatch(lines, @"^(2016-(0[6-9]|1[0-2])|2016-05-(3[1])|2017-01-(0[1-9]|10))\s"))
-                    {
-                        Regex regex = new Regex(@"(\d{4})-(\d{2})-(\d{2})");
-
-
-
-                        string line = reader.ReadLine();
-                        Match match = regex.Match(line);
+                        //Console.WriteLine(lines);
+                        
+                        Match match = regex.Match(line);  
+                        string monthj = match.Groups[2].Value;
 
                         if (match.Success)
                         {
                             string year = match.Groups[1].Value; // Om vi ska rakna flera ar
                             string month = match.Groups[2].Value;
                             string day = match.Groups[3].Value;
+                            string location = match.Groups[4].Value;
+                            double temperature = double.Parse(match.Groups[5].Value, CultureInfo.InvariantCulture);
+                            double humidity = double.Parse(match.Groups[6].Value);
 
-                            float temperature = ExtractTemperature(line);
-                            int humidity = ExtractHumidity(line);
 
-                            if (currentDay == null)
+                            if (temperature > 30 || temperature < -20)
                             {
-                                currentDay = day;
+                                continue;
                             }
 
-                            if (day != currentDay)
+                            DateOnly date;
+                            string dateString = year + "-" + month + "-" + day;
+                            try
                             {
-                                double aveDayTemp = sumTemperature / count;
-                                double aveDayHumidity = humidity / count;
+                                date = WeatherDataManager.ConvertToDateOnly(dateString);
+                            }
+                            catch (ArgumentException ex)
+                            {
 
-                                sumDayHumidity += aveDayHumidity;
-                                sumDayTemp += aveDayTemp;
-
-                                currentDay = day;
-                                sumTemperature = 0;
-                                sumHumidity = 0;
-                                count = 0;
-
-                                double moldRisk = (aveDayHumidity - 78) * (aveDayTemp / 15) / 0.22;
-
-                                string riskLevel = moldRisk > 59 ? "High Risk of mold" : "Low Risk of mold";
+                                continue;
                             }
 
-                            sumTemperature += temp;
-                            sumHumidity += humidity;
-                            count++;
+                            if (currentDayOutside == null)
+                            {
+                                currentDayOutside = day;
+                                currentDayInside = day;
+                            }
+
+                            if (day != currentDayInside && location == "Inne")
+                            {
+                                double aveTemp = sumTemperatureInside / countInside;
+                                double aveHumidity = sumHumidityInside / countInside;
+
+                                string riskStatus = CalculateMoldRisk(aveHumidity, aveTemp).Item1;
+                                int riskOfMold = (int)CalculateMoldRisk(aveHumidity, aveTemp).Item2;
+
+
+                                weatherManager.AddWeatherData(aveTemp, aveHumidity, riskOfMold, riskStatus, date, location);
+
+                                currentDayInside = day;
+                                sumTemperatureInside = 0;
+                                sumHumidityInside = 0;
+                                countInside = 0;
+
+                            }
+                            if (day != currentDayOutside && location == "Ute")
+                            {
+                                double aveTemp = sumTemperatureOutside / countOutside;
+                                double aveHumidity = sumHumidityOutside / countOutside;
+
+
+                                string riskStatus = CalculateMoldRisk(aveHumidity, aveTemp).Item1;
+                                int riskOfMold = (int)CalculateMoldRisk(aveHumidity, aveTemp).Item2;
+
+
+                                weatherManager.AddWeatherData(aveTemp, aveHumidity, riskOfMold, riskStatus, date, location);
+                                currentDayOutside = day;
+                                sumTemperatureOutside = 0;
+                                sumHumidityOutside = 0;
+                                countOutside = 0;
+                            }
+
+                            if (location == "Ute")
+                            {
+                                sumTemperatureOutside += temperature;
+                                sumHumidityOutside += humidity;
+                                countOutside++;
+                            }
+                            else if (location == "Inne")
+                            {
+                                sumTemperatureInside += temperature;
+                                sumHumidityInside += humidity;
+                                countInside++;
+                            }
                         }
-
                     }
-
                 }
-                if (count == 0)
-                {
-
-                }
-                rowCount++;
-                line = reader.ReadLine();
             }
-        }
-    }
 
-    public static void CreateFileIndoor(string fileName)
-    {
-        using (StreamWriter writer = new StreamWriter(path + "InneTemperaturer.txt"))
+
+            return weatherManager.WeatherList;
+        }
+
+        public static (string, double) CalculateMoldRisk(double humidity, double temp)
         {
-            using (StreamReader reader = new StreamReader(path + fileName))
+            double moldRisk = (humidity - 78) * (temp / 15) / 0.22;
+
+            if (moldRisk < 0)
             {
-                string line = reader.ReadLine();
-                int rowCount = 0;
-                while (line != null)
-                {
-                    if (Regex.IsMatch(line, @"\bInne\b"))
-                    {
-                        //Console.WriteLine(rowCount + " " + line);
-                        writer.WriteLine(rowCount + " " + line);
-                    }
-                    rowCount++;
-                    line = reader.ReadLine();
-                }
+                moldRisk = 0;
             }
-        }
-    }
-
-    public static void CreateFileOutdoor(string fileName)
-    {
-        using (StreamWriter writer = new StreamWriter(path + "UteTemperaturer.txt"))
-        {
-            using (StreamReader reader = new StreamReader(path + fileName))
+            if(humidity < 78 && temp < 15)
             {
-                string line = reader.ReadLine();
-                int rowCount = 0;
-                while (line != null)
-                {
-                    if (Regex.IsMatch(line, @"\bUte\b"))
-                    {
-                        // Console.WriteLine(rowCount + " " + line);
-                        writer.WriteLine(rowCount + " " + line);
-                    }
-                    rowCount++;
-                    line = reader.ReadLine();
-                }
+                return ("Temperature and Humidity is below requirement for mold to grow.", moldRisk);
             }
+            else if (humidity < 78)
+            {
+                return ("Humidity is below requirement for mold to grow.", moldRisk);
+            }
+            else if (temp < 15)
+            {
+                return ("Temperature is below requirement for mold to grow.", moldRisk);
+            }
+
+            string riskLevel = moldRisk > 50 ? "High Risk of mold" + moldRisk : "Low Risk of mold" + moldRisk;
+
+            return (riskLevel, moldRisk);
         }
-    }
-    static float ExtractTemperature(string line)
-    {
-        Match match = Regex.Match(line, @"\d+\.\d{1}");
 
-        if (match.Success && float.TryParse(match.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float temp))
-        {
-            return temp;
-        }
 
-        return 0;
-    }
-
-    static int ExtractHumidity(string line)
-    {
-        Match match = Regex.Match(line, @"\d{2}$");
-        return match.Success ? int.Parse(match.Value) : 0;
-    }
-    static float ExtractAvarageTemp(string line)
-    {
 
     }
-
-}
 }
