@@ -23,8 +23,6 @@ using Data;
             Data.ReadFile.CreateFileOutdoor("Tempdata.txt"); // Skapar en fil med utetemperaturer från Tempdata.txt
             Data.ReadFile.CreateFileAverageTemp("UteTemperaturer.txt", "AverageTemperaturerUte.txt"); // Skapar en fil AvergageTemperaturUte.txt med medelvärde från UteTemperaturer.txt
             Data.ReadFile.CreateFileAverageHum("UteTemperaturer.txt", "AverageFuktUte.txt"); // Skapar en fil AvergageFuktUte.txt med medelvärde av UteTemperaturer.txt
-                                                                              //Data.ReadFile.CreateFileAverageTempInside("InneTemperaturer.txt"); // Skapar en fil med medelvärde av InneTemperaturer.
-                                                                              //Data.ReadFile.CreateFileAverageHumInside("InneTemperaturer.txt"); // Skapar en fil med medelvärde av InneTemperaturer.txt
             Data.ReadFile.CreateFileAverageTemp("InneTemperaturer.txt", "AverageTemperaturerInne.txt");
             Data.ReadFile.CreateFileAverageHum("InneTemperaturer.txt", "AverageFuktInne.txt");
 

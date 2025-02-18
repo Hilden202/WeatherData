@@ -96,31 +96,23 @@ namespace WeatherData.Data
             int year, month, day = 1; // Default day = 1 in case user only wants year + month
 
             Console.Clear();
-            Console.SetCursorPosition(85, 8);
             Console.WriteLine("Enter Year (2016-2017): ");
-            Console.SetCursorPosition(76, 8);
 
             while (!int.TryParse(Console.ReadLine(), out year) || year < 2016 || year > 2017)
             {
-                Console.SetCursorPosition(55, 9);
                 Console.WriteLine("Invalid input! Enter a valid Year (2016-2017): ");
             }
 
-            Console.SetCursorPosition(101, 8);
             Console.WriteLine("Enter Month (1-12): ");
-            Console.SetCursorPosition(101, 9);
 
             while (!int.TryParse(Console.ReadLine(), out month) || month < 1 || month > 12)
             {
-                Console.SetCursorPosition(55, 10);
                 Console.WriteLine("Invalid input! Enter a valid Month (1-12): ");
             }
 
             if (includeDay) // If user wants to specify a day
             {
-                Console.SetCursorPosition(115, 8);
                 Console.WriteLine($"Enter Day (1-{DateTime.DaysInMonth(year, month)}): ");
-                Console.SetCursorPosition(115, 9);
 
                 while (!int.TryParse(Console.ReadLine(), out day) || day < 1 || day > DateTime.DaysInMonth(year, month))
                 {
