@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WeatherData.Data
 {
@@ -14,72 +15,61 @@ namespace WeatherData.Data
         {
             
 
-            //double temperatureThreshold = 0.0;
-            //if (season == "Höst")
-            //{
-            //    temperatureThreshold = 10.0;
-            //}
-            //if (season == "Vinter")
-            //{
-            //    temperatureThreshold = 0.0;
-            //}
 
-            double temperatureThreshold = (season == "Höst" ? 10.0 : 0.0);
 
-            for(int i = 0; i < weatherList.Count; i++)
+            double temperatureThreshold = (season == "Höst" ? 10.0 : 0.0); // (season == "Höst" || season == "Vinter") ? 10.0 : 0.0; //
+            DateOnly closestDay = new DateOnly();
+            int daysOfSeason = 0;
+            int highestConsecutive = 0;
+
+            var result = weatherList.GroupBy(x => x.Location).ToList();
+            
+
+            for (int i = 0; i < result.Count; i++)
             {
-                var weather = weatherList[i];
-                int daysOfSeason = 0;
-                int highestConsecutive = 0;
-                int closestDay = 0;
-                if((season == "höst" && weather.Date.Month >= 8) && weather.Date.Month <= 12 || weather.Date.Month <= 2 && weather.Date.Month >= 1 )
+                var location = result[i].Key;
+                if (location == "Ute")
                 {
-
-                }
-                
-            }
-            List<string> list = new List<string>();
-            using (StreamReader reader = new StreamReader(path + fileName))
-            {
-                string pattern = @"(\d{4}-\d{2}-\d{2}): (-{0,1}\d{1,2}.\d)";
-                string line = reader.ReadLine();
-                int daysOfSeason = 0;
-                int highestConsecutive = 0;
-                int closestDay = 0;
-                while (line != null)
-                {
-                    foreach (Match m in Regex.Matches(line, pattern))
+                    foreach (var weather in result[i])
                     {
-                        if (m.Success)
+                        if ((season == "Höst" && weather.Date.Month >= 8) && weather.Date.Month <= 12 || season == "Vinter")
                         {
-                            list.Add(m.Groups[1].Value.ToString() + " med temperaturen " + m.Groups[2].Value.ToString());
-                            DateOnly date = DateOnly.Parse(m.Groups[1].ToString());
-                            DateOnly earliestAutumn = new DateOnly(2016, 08, 01);
-                            if (double.Parse(m.Groups[2].Value.ToString().Replace('.', ',')) < temperatureThreshold && date.CompareTo(earliestAutumn) >= 0)
+                            if (weather.AveTemp < temperatureThreshold)
                             {
                                 daysOfSeason++;
+                                //Console.WriteLine(weather.Date + "\t" + weather.AveTemp.ToString("F2"));
+                                //Console.WriteLine(daysOfSeason);
                                 if (daysOfSeason > highestConsecutive)
                                 {
                                     highestConsecutive = daysOfSeason;
-                                    closestDay = list.Count;
+                                    closestDay = weather.Date;
                                 }
                                 if (daysOfSeason == 5)
                                 {
-                                    Console.WriteLine(date);
-                                    Console.WriteLine($"{season} började " + list[list.Count - 5]);
+                                    Console.WriteLine($"{weather.Date}: det har nu varit 5 dagar av medeltemperatur under {temperatureThreshold}");
+                                    Console.WriteLine($"{season} började " + weather.Date.AddDays(-4));
                                     return;
                                 }
                             }
                             else
                             {
+                                //Console.WriteLine(weather.Date + " nollställd" + weather.AveTemp.ToString("F2") + "   " + weather.Location);
                                 daysOfSeason = 0;
                             }
                         }
+
                     }
-                    line = reader.ReadLine();
+                    Console.WriteLine($"{season} började aldrig, närmast var {closestDay} efter {highestConsecutive} dagar av medeltemperatur under {temperatureThreshold}");
+
+
                 }
-                Console.WriteLine($"{season} har inte börjat inom intervallen, närmast var " + list[closestDay]);
+                //else
+                //{
+                    
+                //    //Console.WriteLine(weather.Date + " Matchade ej season date");
+                //}
             }
         }
+           
     }
 }

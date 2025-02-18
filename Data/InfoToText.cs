@@ -3,28 +3,33 @@
     internal class InfoToText
     {
 
-        public delegate void MyDelegate(List<Data.WeatherData> weatherList);
+        public delegate double CalculateWeatherMonthly(List<Data.WeatherData> weatherList);
+
+        public static class WeatherCalculations
+        {
+            public static double CalculateAverageTemp(List<WeatherData> data) =>
+                data.Any() ? data.Average(w => w.AveTemp) : 0;
+
+            public static double CalculateAverageHumidity(List<WeatherData> data) =>
+                data.Any() ? data.Average(w => w.AveHumidity) : 0;
+        }
+
 
         class WriteInfo
         {
+            public static void WriteTextFile(List<Data.WeatherData> weatherList)
+            {
 
-            //static void Main(string[] args)
-            //{
-            //    string filePath = "../../../Files/MonthlyData.txt";
+                var monthlyData = weatherList
+                .GroupBy(w => $"{w.Date.Year}-{w.Date.Month:D2}")
+                .ToDictionary(g => g.Key, g => g.ToList());
 
-            //    // Create and write to the file
-            //    using (StreamWriter writer = new StreamWriter(filePath))
-            //    {
-            //        writer.WriteLine($"Month\tInside\tOutSide\tLocation");
+                CalculateWeatherMonthly monthlyTemp = WeatherCalculations.CalculateAverageTemp;
+                CalculateWeatherMonthly monthlyHumid = WeatherCalculations.CalculateAverageHumidity;
 
-            //        var monthlyData = new List<Data.WeatherData>();
-
-            //        // gruppera på månader groupkey
-
-                    // skrivut
-            //    }
-            //}
+            }
         }
+
 
     }
 }

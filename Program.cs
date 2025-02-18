@@ -6,7 +6,7 @@ class Program
     static void Main(string[] args)
     {
         var weatherManager = ReadFile.ReadWeatherInfo("../../../Files/tempdata5-med fel.txt");
-
+        // function som skriver ut till fill
         Console.Clear();
         Console.WriteLine("Välj ett alternativ:");
         Console.WriteLine("T. Sök specific dag.");
@@ -32,7 +32,11 @@ class Program
                 }
             case ConsoleKey.M:
                 {
+                    string season = "Höst";
+                    
 
+                    SeasonControll.SeasonStarted(weatherManager, "Höst");
+                    SeasonControll.SeasonStarted(weatherManager, "Vinter");
                     break;
                 }
 
