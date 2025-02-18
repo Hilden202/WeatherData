@@ -63,8 +63,9 @@
 
                         writer.WriteLine(StartSeason);
                         writer.WriteLine();
-                        writer.WriteLine("Våran Formula för mögel: (humidity - 78) * (temp / 15) / 0.22");
+                        
                     }
+                    writer.WriteLine("Våran Formula för mögel: (humidity - 78) * (temp / 15) / 0.22");
                 }
             }
         }

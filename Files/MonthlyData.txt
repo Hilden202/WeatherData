@@ -42,7 +42,6 @@ Mold Risk: 0,00 	4,87
 
 2016-10-09: det har nu varit 5 dagar av medeltemperatur under 10°C, Höst började 2016-10-05
 
-Våran Formula för mögel: (humidity - 78) * (temp / 15) / 0.22
-Vinter började aldrig, närmast var 2016-11-10 efter 4 dagar av medeltemperatur under 0°C
+Vinter började aldrig, närmast var 2016-11-06 med 4 efterföljande dagar där medeltemperaturen låg under 0°C
 
 Våran Formula för mögel: (humidity - 78) * (temp / 15) / 0.22
