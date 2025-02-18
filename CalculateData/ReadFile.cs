@@ -2,11 +2,11 @@
 using System.Text.RegularExpressions;
 using static WeatherData.Data.WeatherData;
 
-namespace WeatherData.Data
+namespace WeatherData.CalculateData
 {
     public class ReadFile
     {
-        public static List<WeatherData> ReadWeatherInfo(string filePath)
+        public static List<Data.WeatherData> ReadWeatherInfo(string filePath)
         {
             var weatherManager = new WeatherDataManager();
 
@@ -29,14 +29,14 @@ namespace WeatherData.Data
                 int countOutside = 0;
 
                 foreach (var line in File.ReadAllLines(filePath))
-                { 
+                {
                     if (!Regex.IsMatch(line, @"^(2016-05-\d{2}|2017-01-\d{2})"))
                     {
                         Regex regex = new Regex(@"(\d{4})-(\d{2})-(\d{2}) \d{2}:\d{2}:\d{2},(Ute|Inne),(-?\d{1,2}\.\d+),(\d{1,3})");
 
                         //Console.WriteLine(lines);
-                        
-                        Match match = regex.Match(line);  
+
+                        Match match = regex.Match(line);
                         string monthj = match.Groups[2].Value;
 
                         if (match.Success)
@@ -135,7 +135,7 @@ namespace WeatherData.Data
             {
                 moldRisk = 0;
             }
-            if(humidity < 78 && temp < 15)
+            if (humidity < 78 && temp < 15)
             {
                 return ("Temperature and Humidity is below requirement for mold to grow.", moldRisk);
             }

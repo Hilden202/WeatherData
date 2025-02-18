@@ -1,6 +1,8 @@
-﻿namespace WeatherData
+﻿using WeatherData.Data;
+
+namespace WeatherData.CalculateData
 {
-    internal class Helpers
+    internal class Search
     {
 
         public static void SearchWeatherData(List<Data.WeatherData> weatherList, bool includeDay)
@@ -73,9 +75,9 @@
                 {
                     results = key.Key switch
                     {
-                        ConsoleKey.T => results.OrderBy(p => p.AveTemp).ToList(),
+                        ConsoleKey.T => results.OrderByDescending(p => p.AveTemp).ToList(),
                         ConsoleKey.H => results.OrderBy(p => p.AveHumidity).ToList(),
-                        ConsoleKey.M => results.OrderBy(p => p.RiskOfMold).ToList(),
+                        ConsoleKey.M => results.OrderByDescending(p => p.RiskOfMold).ToList(),
                         _ => results
                     };
 
@@ -86,8 +88,8 @@
                         if (location == string.Empty || data.Location == location) // Show all if location is invalid
                         {
                             Console.WriteLine($"Date: {data.Date}   ||   Location: {data.Location}");
-                            Console.WriteLine("Temp: " + data.AveTemp.ToString("F2"));
-                            Console.WriteLine("Humidity: " + data.AveHumidity.ToString("F2"));
+                            Console.WriteLine("Temp: " + data.AveTemp.ToString("F2").TemperatureString());
+                            Console.WriteLine("Humidity: " + data.AveHumidity.ToString("F2").ProcentString());
                             Console.WriteLine("Risk: " + data.RiskStatus);
                             Console.WriteLine();
                         }
@@ -95,6 +97,7 @@
 
 
                 }
+                Console.ReadKey();
             }
         }
     }

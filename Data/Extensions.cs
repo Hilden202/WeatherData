@@ -13,5 +13,10 @@ namespace WeatherData.Data
             input = input + "C°";
             return input;
         }
+        public static string ProcentString(this string input)
+        {
+            input = input + "%";
+            return input;
+        }
     }
 }
