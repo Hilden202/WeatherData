@@ -6,15 +6,12 @@ class Program
 {
     static void Main(string[] args)
     {
-        
         var weatherManager = ReadFile.ReadWeatherInfo("../../../Files/tempdata5-med fel.txt");
-        
+
         InfoToText.WriteInfo.WriteTextFile(weatherManager);
         bool run = true;
         while (run == true)
         {
-
-
             Console.Clear();
             Console.WriteLine("Välj ett alternativ:");
             Console.WriteLine("T. Sök specific dag.");
@@ -40,11 +37,9 @@ class Program
                     }
                 case ConsoleKey.M:
                     {
-                      
+                        Console.Clear();
                         Console.WriteLine(SeasonControll.SeasonStarted(weatherManager, "Höst"));
                         Console.WriteLine(SeasonControll.SeasonStarted(weatherManager, "Vinter"));
-
-                        Console.ReadKey();
                         break;
                     }
                 case ConsoleKey.Escape:
@@ -52,11 +47,10 @@ class Program
                         run = false;
                         break;
                     }
-
             }
+            Console.WriteLine();
+            Console.WriteLine("Tryck på valfri tangent för att gå tillbaka till menyn...");
+            Console.ReadKey(true);
         }
-
-
     }
 }
-

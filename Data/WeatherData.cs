@@ -7,12 +7,10 @@ namespace WeatherData.Data
     {
         public double AveTemp { get; set; }
         public double AveHumidity { get; set; }
-
         public double RiskOfMold { get; set; }
         public string RiskStatus { get; set; }
         public DateOnly Date { get; set; }
         public string Location { get; set; }
-
 
         public WeatherData(double aveTemp, double aveHumidity, double riskOfMold, string riskStatus, DateOnly date, string location)
         {
@@ -23,7 +21,6 @@ namespace WeatherData.Data
             Date = date;
             Location = location;
         }
-
 
         public static List<WeatherData> WeatherList { get; set; } = new List<WeatherData>();
 
@@ -40,8 +37,6 @@ namespace WeatherData.Data
             {
                 WeatherList.Add(new WeatherData(aveTemp, aveHumidity, riskOfMold, riskStatus, date, location));
             }
-
-
 
             public static DateOnly ConvertToDateOnly(string dateString)
             {
@@ -70,9 +65,6 @@ namespace WeatherData.Data
                 }
                 throw new ArgumentException("Invalid date format. Expected yyyy-MM-dd");
             }
-
-
-
         }
     }
 }

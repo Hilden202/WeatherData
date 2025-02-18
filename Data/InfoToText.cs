@@ -2,7 +2,6 @@
 {
     internal class InfoToText
     {
-
         public delegate double CalculateWeatherMonthly(List<Data.WeatherData> weatherList);
 
         public static class WeatherCalculations
@@ -15,7 +14,6 @@
             public static double CalculateAverageMoldRisk(List<WeatherData> data) =>
                 data.Any() ? data.Average(w => w.RiskOfMold) : 0;
         }
-
 
         public static class WriteInfo
         {
@@ -30,9 +28,6 @@
                     CalculateWeatherMonthly monthlyTemp = WeatherCalculations.CalculateAverageTemp;
                     CalculateWeatherMonthly monthlyHumid = WeatherCalculations.CalculateAverageHumidity;
                     CalculateWeatherMonthly monthlyRiskOfMold = WeatherCalculations.CalculateAverageMoldRisk;
-
-   
-                    
 
                     foreach (var month in monthlyData)
                     {

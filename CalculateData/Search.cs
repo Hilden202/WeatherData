@@ -81,21 +81,20 @@ namespace WeatherData.CalculateData
                         _ => results
                     };
 
-
                     Console.Clear();
                     foreach (var data in results)
                     {
                         if (location == string.Empty || data.Location == location) // Show all if location is invalid
                         {
                             Console.WriteLine($"Date: {data.Date}   ||   Location: {data.Location}");
+                            Console.ForegroundColor = data.AveTemp.GetTemperatureColor();
                             Console.WriteLine("Temp: " + data.AveTemp.ToString("F2").TemperatureString());
+                            Console.ResetColor();
                             Console.WriteLine("Humidity: " + data.AveHumidity.ToString("F2").ProcentString());
                             Console.WriteLine("Risk: " + data.RiskStatus);
                             Console.WriteLine();
                         }
                     }
-
-
                 }
                 Console.ReadKey();
             }

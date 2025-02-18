@@ -48,7 +48,6 @@ namespace WeatherData.CalculateData
                                 daysOfSeason = 0;
                             }
                         }
-
                     }
                     string seasonChange = $"{season} började aldrig, närmast var {closestDay.AddDays(-highestConsecutive)} med {highestConsecutive} efterföljande dagar där medeltemperaturen låg under {temperatureThreshold.ToString().TemperatureString()}";
                     return seasonChange;
@@ -56,6 +55,5 @@ namespace WeatherData.CalculateData
             }
             return ""; // Blank sträng om den inte får fram något annat
         }
-
     }
 }

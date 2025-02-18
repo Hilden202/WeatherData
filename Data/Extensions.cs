@@ -18,5 +18,14 @@ namespace WeatherData.Data
             input = input + "%";
             return input;
         }
+
+        public static ConsoleColor GetTemperatureColor(this double temp)
+        {
+            if (temp < 0) return ConsoleColor.Blue;
+            if (temp < 10) return ConsoleColor.Cyan;
+            if (temp < 20) return ConsoleColor.Green;
+            if (temp < 30) return ConsoleColor.Yellow;
+            return ConsoleColor.Red;
+        }
     }
 }
