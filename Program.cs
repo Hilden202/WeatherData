@@ -33,10 +33,10 @@ class Program
             case ConsoleKey.M:
                 {
                     string season = "Höst";
-                    
 
-                    SeasonControll.SeasonStarted(weatherManager, "Höst");
-                    SeasonControll.SeasonStarted(weatherManager, "Vinter");
+
+                    Console.WriteLine(SeasonControll.SeasonStarted(weatherManager, "Höst"));
+                    Console.WriteLine(SeasonControll.SeasonStarted(weatherManager, "Vinter"));
                     break;
                 }
 

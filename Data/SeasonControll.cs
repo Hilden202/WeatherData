@@ -11,20 +11,14 @@ namespace WeatherData.Data
 {
     internal class SeasonControll
     {
-        public static void SeasonStarted(List<Data.WeatherData> weatherList, string season)
+        public static string SeasonStarted(List<Data.WeatherData> weatherList, string season)
         {
-            
-
-
-
             double temperatureThreshold = (season == "Höst" ? 10.0 : 0.0); // (season == "Höst" || season == "Vinter") ? 10.0 : 0.0; //
             DateOnly closestDay = new DateOnly();
             int daysOfSeason = 0;
             int highestConsecutive = 0;
-
             var result = weatherList.GroupBy(x => x.Location).ToList();
             
-
             for (int i = 0; i < result.Count; i++)
             {
                 var location = result[i].Key;
@@ -37,8 +31,6 @@ namespace WeatherData.Data
                             if (weather.AveTemp < temperatureThreshold)
                             {
                                 daysOfSeason++;
-                                //Console.WriteLine(weather.Date + "\t" + weather.AveTemp.ToString("F2"));
-                                //Console.WriteLine(daysOfSeason);
                                 if (daysOfSeason > highestConsecutive)
                                 {
                                     highestConsecutive = daysOfSeason;
@@ -46,29 +38,22 @@ namespace WeatherData.Data
                                 }
                                 if (daysOfSeason == 5)
                                 {
-                                    Console.WriteLine($"{weather.Date}: det har nu varit 5 dagar av medeltemperatur under {temperatureThreshold}");
-                                    Console.WriteLine($"{season} började " + weather.Date.AddDays(-4));
-                                    return;
+                                    string seasonalShift = $"{weather.Date}: det har nu varit 5 dagar av medeltemperatur under {temperatureThreshold.ToString().TemperatureString()}, {season} började {weather.Date.AddDays(-4)}";
+                                    return seasonalShift;
                                 }
                             }
                             else
                             {
-                                //Console.WriteLine(weather.Date + " nollställd" + weather.AveTemp.ToString("F2") + "   " + weather.Location);
                                 daysOfSeason = 0;
                             }
                         }
 
                     }
-                    Console.WriteLine($"{season} började aldrig, närmast var {closestDay} efter {highestConsecutive} dagar av medeltemperatur under {temperatureThreshold}");
-
-
+                    string seasonChange = $"{season} började aldrig, närmast var {closestDay} efter {highestConsecutive} dagar av medeltemperatur under {temperatureThreshold.ToString().TemperatureString()}";
+                    return seasonChange;
                 }
-                //else
-                //{
-                    
-                //    //Console.WriteLine(weather.Date + " Matchade ej season date");
-                //}
             }
+            return ""; // Blank sträng om den inte får fram något annat
         }
            
     }
