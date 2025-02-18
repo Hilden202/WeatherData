@@ -10,7 +10,7 @@ namespace WeatherData.Data
     {
         public static string TemperatureString(this string input)
         {
-            input = input + "C°";
+            input = input + "°C";
             return input;
         }
         public static string ProcentString(this string input)

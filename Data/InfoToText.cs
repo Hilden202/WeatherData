@@ -51,7 +51,7 @@
 
                         writer.WriteLine($"\t\tDate: {month.Key}");
                         writer.WriteLine($"Location: {insideData.First().Location}\t\t{outsideData.First().Location}");
-                        writer.WriteLine($"Temperature: {avgHumuidityInside:F2} °C\t{avgTempOutside:F2} °C");
+                        writer.WriteLine($"Temperature: {avgTempInside:F2} °C\t{avgTempOutside:F2} °C");
                         writer.WriteLine($"Humidity: {avgHumuidityInside:F2}% \t{avgHumuidityOutside:F2}%");
                         writer.WriteLine($"Mold Risk: {avgMoldRiskInside:F2} \t{avgMoldRiskOutside:F2}");
                         writer.WriteLine(); // Blank line for better readability
