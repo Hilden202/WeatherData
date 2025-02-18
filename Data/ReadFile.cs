@@ -86,9 +86,6 @@ namespace WeatherData.Data
         public static void SortDataBy(string fileName, bool IsTemp)
         {
             string pattern = @"(\d{4}-\d{2}-\d{2}): (-{0,1}\d{1,2}.\d)";
-            //string temperaturePattern = @"(\d{4}-\d{2}-\d{2}).*((?<=,)\d{1,2}.\d)";
-            //string humidityPattern = @"(\d{4}-\d{2}-\d{2}).*((?<=,)\d{1,2})";
-            //List<string> list = new List<string>(); 
             List<Tuple<double, string>> list = new List<Tuple<double, string>>();
             using (StreamReader reader = new StreamReader(path + fileName))
             {
@@ -100,17 +97,16 @@ namespace WeatherData.Data
                     {
                         if (m.Success)
                         {
+                            // Group[2] is the temperature, Group[1] is the date
                             double temperature = double.Parse(m.Groups[2].Value.ToString(), CultureInfo.InvariantCulture);
                             string date = m.Groups[1].Value.ToString();
-                            // Group[2] is the temperature, Group[1] is the date
-                            //list.Add(m.Groups[2].Value.ToString() + "\t\t" + m.Groups[1].Value.ToString());
                             list.Add(new Tuple<double, string>(temperature, date));
                         }
                     }
                     line = reader.ReadLine();
                 }
             }
-            //list.Sort(); // Sort list 
+            // Sort list 
             list.Sort((a, b) => a.Item1.CompareTo(b.Item1));
             // If sorted by temperature
             Console.Clear();
@@ -132,9 +128,6 @@ namespace WeatherData.Data
                     Console.WriteLine(entry.Item1.ToString("0.0", CultureInfo.InvariantCulture) + "%\t\t" + entry.Item2);
                 }
             }
-            // Write sorted data
-            
-
         }
 
         public static void ReadAllTest(string filePath, List<WeatherData> weatherList)
@@ -286,6 +279,27 @@ namespace WeatherData.Data
             string riskLevel = moldRisk > 50 ? "High Risk of mold" + moldRisk : "Low Risk of mold" + moldRisk;
 
             return riskLevel;
+        }
+        public static void CreateFile(string fileName, string location)
+        {
+            using (StreamWriter writer = new StreamWriter(path + (location + "Temperaturer.txt")))
+            {
+                using (StreamReader reader = new StreamReader(path + fileName))
+                {
+                    string line = reader.ReadLine();
+                    int rowCount = 0;
+                    while (line != null)
+                    {
+                        if (Regex.IsMatch(line, $@"\b{location}\b"))
+                        {
+                            //Console.WriteLine(rowCount + " " + line);
+                            writer.WriteLine(rowCount + " " + line);
+                        }
+                        rowCount++;
+                        line = reader.ReadLine();
+                    }
+                }
+            }
         }
         public static void CreateFileIndoor(string fileName)
         {

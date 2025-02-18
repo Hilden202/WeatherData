@@ -14,7 +14,7 @@ using Data;
             Data.ReadFile.ReadAllAndCreateFileTempdata("tempdata5-med fel.txt"); // Skapar en koreekt fil med temperaturdata Tempdata.txt
             try
             {
-                Data.ReadFile.CreateFileIndoor("Tempdata.txt"); // Skapar en fil med innetemperaturer från Tempdata.txt
+                Data.ReadFile.CreateFile("Tempdata.txt", "Inne"); // Skapar en fil med innetemperaturer från Tempdata.txt
             }
             catch(Exception ex)
             {
