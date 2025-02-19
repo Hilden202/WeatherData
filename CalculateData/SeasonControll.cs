@@ -39,7 +39,7 @@ namespace WeatherData.CalculateData
                                 }
                                 if (daysOfSeason == 5)
                                 {
-                                    string seasonalShift = $"{weather.Date}: det har nu varit 5 dagar av medeltemperatur under {temperatureThreshold.ToString().TemperatureString()}, {season} började {weather.Date.AddDays(-4)}";
+                                    string seasonalShift = $"{weather.Date}: det har nu varit 5 dagar av medeltemperatur under {temperatureThreshold.ToString().TemperatureString()}, {season} började {weather.Date.AddDays(-5)}";
                                     return seasonalShift;
                                 }
                             }
