@@ -1,47 +1,47 @@
 		Date: 2016-06
 Location: Inne		Ute
-Temperature: 24,64 °C	15,49 °C
-Humidity: 28,51% 	48,59%
-Mold Risk: 0,00 	6,24
+Temperature: 24,61 °C	15,46 °C
+Humidity: 28,87% 	49,75%
+Mold Risk: -365,84 	-143,22
 
 		Date: 2016-07
 Location: Inne		Ute
-Temperature: 25,58 °C	19,04 °C
-Humidity: 42,34% 	61,62%
-Mold Risk: 0,00 	0,00
+Temperature: 26,16 °C	20,06 °C
+Humidity: 42,95% 	56,14%
+Mold Risk: -278,38 	-140,96
 
 		Date: 2016-08
 Location: Inne		Ute
-Temperature: 25,92 °C	19,08 °C
-Humidity: 35,48% 	46,40%
-Mold Risk: 0,00 	0,00
+Temperature: 25,49 °C	17,44 °C
+Humidity: 34,23% 	50,88%
+Mold Risk: -338,05 	-150,71
 
 		Date: 2016-09
 Location: Inne		Ute
-Temperature: 23,33 °C	16,19 °C
-Humidity: 40,94% 	60,22%
-Mold Risk: 0,00 	0,00
+Temperature: 23,22 °C	16,11 °C
+Humidity: 41,32% 	59,74%
+Mold Risk: -258,03 	-96,72
 
 		Date: 2016-10
 Location: Inne		Ute
-Temperature: 22,41 °C	8,39 °C
-Humidity: 28,04% 	63,61%
-Mold Risk: 0,00 	0,11
+Temperature: 22,41 °C	8,18 °C
+Humidity: 27,25% 	64,17%
+Mold Risk: -344,47 	-38,07
 
 		Date: 2016-11
 Location: Inne		Ute
-Temperature: 22,81 °C	4,02 °C
-Humidity: 19,24% 	83,86%
-Mold Risk: 0,00 	7,27
+Temperature: 22,77 °C	3,86 °C
+Humidity: 18,98% 	84,13%
+Mold Risk: -406,94 	5,62
 
 		Date: 2016-12
 Location: Inne		Ute
-Temperature: 21,75 °C	3,00 °C
-Humidity: 15,87% 	78,24%
-Mold Risk: 0,00 	4,87
+Temperature: 21,77 °C	3,15 °C
+Humidity: 16,04% 	78,39%
+Mold Risk: -408,64 	1,47
 
-2016-10-09: det har nu varit 5 dagar av medeltemperatur under 10°C, Höst började 2016-10-04
+2016-10-08: det har nu varit 5 dagar av medeltemperatur under 10°C, Höst började 2016-10-03
 
-Vinter började aldrig, närmast var 2016-11-06 med 4 efterföljande dagar där medeltemperaturen låg under 0°C
+Vinter började aldrig, närmast var 2016-11-05 med 4 efterföljande dagar där medeltemperaturen låg under 0°C
 
 Våran Formula för mögel: (humidity - 78) * (temp / 15) / 0.22

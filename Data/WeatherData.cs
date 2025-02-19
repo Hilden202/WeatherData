@@ -8,7 +8,7 @@ namespace WeatherData.Data
         public double AveTemp { get; set; }
         public double AveHumidity { get; set; }
         public double RiskOfMold { get; set; }
-        public string RiskStatus { get; set; }
+        public string? RiskStatus { get; set; }
         public DateOnly Date { get; set; }
         public string Location { get; set; }
 

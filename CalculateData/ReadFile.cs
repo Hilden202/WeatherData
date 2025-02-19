@@ -1,6 +1,9 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Threading.Tasks;
 using static WeatherData.Data.WeatherData;
+using static WeatherData.Data.InfoToText;
 
 namespace WeatherData.CalculateData
 {
@@ -9,35 +12,16 @@ namespace WeatherData.CalculateData
         public static List<Data.WeatherData> ReadWeatherInfo(string filePath)
         {
             var weatherManager = new WeatherDataManager();
-
+            var temporaryList = new List<Data.WeatherData>();
 
             using (StreamReader reader = new StreamReader(filePath))
             {
-                string lines;
-
-                string currentDayInside = null;
-                string currentDayOutside = null;
-
-                double sumTemperatureInside = 0; // avarage day Inside
-                double sumHumidityInside = 0;
-
-                //---------------------------------------------------------------
-                double sumTemperatureOutside = 0; // avarage day Outside
-                double sumHumidityOutside = 0;
-
-                int countInside = 0;
-                int countOutside = 0;
-
                 foreach (var line in File.ReadAllLines(filePath))
                 {
                     if (!Regex.IsMatch(line, @"^(2016-05-\d{2}|2017-01-\d{2})"))
                     {
                         Regex regex = new Regex(@"(\d{4})-(\d{2})-(\d{2}) \d{2}:\d{2}:\d{2},(Ute|Inne),(-?\d{1,2}\.\d+),(\d{1,3})");
-
-                        //Console.WriteLine(lines);
-
                         Match match = regex.Match(line);
-                        string monthj = match.Groups[2].Value;
 
                         if (match.Success)
                         {
@@ -47,7 +31,6 @@ namespace WeatherData.CalculateData
                             string location = match.Groups[4].Value;
                             double temperature = double.Parse(match.Groups[5].Value, CultureInfo.InvariantCulture);
                             double humidity = double.Parse(match.Groups[6].Value);
-
 
                             if (temperature > 30 || temperature < -20)
                             {
@@ -62,95 +45,49 @@ namespace WeatherData.CalculateData
                             }
                             catch (ArgumentException ex)
                             {
-
                                 continue;
                             }
 
-                            if (currentDayOutside == null)
-                            {
-                                currentDayOutside = day;
-                                currentDayInside = day;
-                            }
+                            double riskOfMold = CalculateMoldRisk(humidity, temperature);
 
-                            if (day != currentDayInside && location == "Inne")
-                            {
-                                double aveTemp = sumTemperatureInside / countInside;
-                                double aveHumidity = sumHumidityInside / countInside;
-
-                                string riskStatus = CalculateMoldRisk(aveHumidity, aveTemp).Item1;
-                                int riskOfMold = (int)CalculateMoldRisk(aveHumidity, aveTemp).Item2;
-
-
-                                weatherManager.AddWeatherData(aveTemp, aveHumidity, riskOfMold, riskStatus, date, location);
-
-                                currentDayInside = day;
-                                sumTemperatureInside = 0;
-                                sumHumidityInside = 0;
-                                countInside = 0;
-
-                            }
-                            if (day != currentDayOutside && location == "Ute")
-                            {
-                                double aveTemp = sumTemperatureOutside / countOutside;
-                                double aveHumidity = sumHumidityOutside / countOutside;
-
-
-                                string riskStatus = CalculateMoldRisk(aveHumidity, aveTemp).Item1;
-                                int riskOfMold = (int)CalculateMoldRisk(aveHumidity, aveTemp).Item2;
-
-
-                                weatherManager.AddWeatherData(aveTemp, aveHumidity, riskOfMold, riskStatus, date, location);
-                                currentDayOutside = day;
-                                sumTemperatureOutside = 0;
-                                sumHumidityOutside = 0;
-                                countOutside = 0;
-                            }
-
-                            if (location == "Ute")
-                            {
-                                sumTemperatureOutside += temperature;
-                                sumHumidityOutside += humidity;
-                                countOutside++;
-                            }
-                            else if (location == "Inne")
-                            {
-                                sumTemperatureInside += temperature;
-                                sumHumidityInside += humidity;
-                                countInside++;
-                            }
+                            string riskStatus = string.Empty;
+                            temporaryList.Add(new Data.WeatherData(temperature,humidity, riskOfMold,riskStatus,date,location));
                         }
                     }
                 }
+                var groupedDay = temporaryList.GroupBy(p => $"{p.Date.Year}-{p.Date.Month}-{p.Date.Day}").ToList();
+
+                foreach (var specificDay in groupedDay)
+                {
+                    var insideData = specificDay.Where(p => p.Location == "Inne").ToList();
+                    var outsideData = specificDay.Where(p => p.Location == "Ute").ToList();
+
+                    double avgTempInside = WeatherCalculations.DeligateThis(WeatherCalculations.CalculateAverageTemp, insideData);
+                    double avgTempOutside = WeatherCalculations.DeligateThis(WeatherCalculations.CalculateAverageTemp, outsideData);
+
+                    double avgHumuidityInside = WeatherCalculations.DeligateThis(WeatherCalculations.CalculateAverageHumidity, insideData);
+                    double avgHumuidityOutside = WeatherCalculations.DeligateThis(WeatherCalculations.CalculateAverageHumidity, outsideData);
+
+                    double avgMoldRiskInside = WeatherCalculations.DeligateThis(WeatherCalculations.CalculateAverageMoldRisk, insideData);
+                    double avgMoldRiskOutside = WeatherCalculations.DeligateThis(WeatherCalculations.CalculateAverageMoldRisk, outsideData);
+
+                    string riskStatusInside = WeatherCalculations.CalculateMoldStatus(avgTempInside, avgTempInside, avgHumuidityInside);
+                    string riskStatusOutside = WeatherCalculations.CalculateMoldStatus(avgTempOutside, avgTempOutside, avgHumuidityOutside);
+
+
+                    weatherManager.AddWeatherData(avgTempInside, avgHumuidityInside, avgMoldRiskInside, riskStatusInside, insideData.First().Date, insideData.First().Location);
+                    weatherManager.AddWeatherData(avgTempOutside, avgHumuidityOutside, avgMoldRiskOutside, riskStatusOutside, outsideData.First().Date, outsideData.First().Location);
+
+                }
             }
-
-
             return weatherManager.WeatherList;
         }
-
-        public static (string, double) CalculateMoldRisk(double humidity, double temp)
+        
+        public static  double CalculateMoldRisk(double humidity, double temp)
         {
             double moldRisk = (humidity - 78) * (temp / 15) / 0.22;
 
-            if (moldRisk < 0)
-            {
-                moldRisk = 0;
-            }
-            if (humidity < 78 && temp < 15)
-            {
-                return ("Temperature and Humidity is below requirement for mold to grow.", moldRisk);
-            }
-            else if (humidity < 78)
-            {
-                return ("Humidity is below requirement for mold to grow.", moldRisk);
-            }
-            else if (temp < 15)
-            {
-                return ("Temperature is below requirement for mold to grow.", moldRisk);
-            }
-
-            string riskLevel = moldRisk > 50 ? "High Risk of mold" + moldRisk : "Low Risk of mold" + moldRisk;
-
-            return (riskLevel, moldRisk);
+            return moldRisk;
         }
 
 

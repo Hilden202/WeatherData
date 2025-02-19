@@ -13,10 +13,31 @@
                 data.Any() ? data.Average(w => w.AveHumidity) : 0;
             public static double CalculateAverageMoldRisk(List<WeatherData> data) =>
                 data.Any() ? data.Average(w => w.RiskOfMold) : 0;
-
-            public static double DeligateThis(CalculateWeatherMonthly calculate, List<Data.WeatherData> weatherList)
+            public static string CalculateMoldStatus(double risk, double humidity, double temp)
             {
-                return calculate(weatherList);
+                if (risk < 0)
+                {
+                    risk = 0;
+                }
+                if (humidity < 78 && temp < 15)
+                {
+                    return "Temperature and Humidity is below requirement for mold to grow.";
+                }
+                else if (humidity < 78)
+                {
+                    return "Humidity is below requirement for mold to grow.";
+                }
+                else if (temp < 15)
+                {
+                    return "Temperature is below requirement for mold to grow.";
+                }
+
+                string riskLevel = risk > 50 ? "High Risk of mold" + risk : "Low Risk of mold" + risk;
+                return riskLevel;
+            }
+            public static double DeligateThis(CalculateWeatherMonthly metod, List<Data.WeatherData> weatherList)
+            {
+                return metod(weatherList);
             }
         }
 
@@ -30,9 +51,7 @@
                         .GroupBy(w => $"{w.Date.Year}-{w.Date.Month:D2}")
                         .ToDictionary(g => g.Key, g => g.ToList());
 
-                    CalculateWeatherMonthly monthlyTemp = WeatherCalculations.CalculateAverageTemp;
-                    CalculateWeatherMonthly monthlyHumid = WeatherCalculations.CalculateAverageHumidity;
-                    CalculateWeatherMonthly monthlyRiskOfMold = WeatherCalculations.CalculateAverageMoldRisk;
+                    
 
                     foreach (var month in monthlyData)
                     {
