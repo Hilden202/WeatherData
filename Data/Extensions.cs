@@ -23,8 +23,8 @@ namespace WeatherData.Data
         {
             if (temp < 0) return ConsoleColor.Blue;
             if (temp < 10) return ConsoleColor.Cyan;
-            if (temp < 20) return ConsoleColor.Green;
-            if (temp < 30) return ConsoleColor.Yellow;
+            if (temp < 17) return ConsoleColor.Green;
+            if (temp < 25) return ConsoleColor.Yellow;
             return ConsoleColor.Red;
         }
     }

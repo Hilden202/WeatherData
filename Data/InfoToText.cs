@@ -13,6 +13,11 @@
                 data.Any() ? data.Average(w => w.AveHumidity) : 0;
             public static double CalculateAverageMoldRisk(List<WeatherData> data) =>
                 data.Any() ? data.Average(w => w.RiskOfMold) : 0;
+
+            public static double DeligateThis(CalculateWeatherMonthly calculate, List<Data.WeatherData> weatherList)
+            {
+                return calculate(weatherList);
+            }
         }
 
         public static class WriteInfo
@@ -34,14 +39,14 @@
                         var insideData = month.Value.Where(w => w.Location == "Inne").ToList();
                         var outsideData = month.Value.Where(w => w.Location == "Ute").ToList();
 
-                        double avgTempInside = monthlyTemp(insideData);
-                        double avgTempOutside = monthlyTemp(outsideData);
+                        double avgTempInside = WeatherCalculations.DeligateThis(WeatherCalculations.CalculateAverageTemp, insideData);
+                        double avgTempOutside = WeatherCalculations.DeligateThis(WeatherCalculations.CalculateAverageTemp, outsideData);
 
-                        double avgHumuidityInside = monthlyHumid(insideData);
-                        double avgHumuidityOutside = monthlyHumid(outsideData);
+                        double avgHumuidityInside = WeatherCalculations.DeligateThis(WeatherCalculations.CalculateAverageHumidity, insideData);
+                        double avgHumuidityOutside = WeatherCalculations.DeligateThis(WeatherCalculations.CalculateAverageHumidity, outsideData);
 
-                        double avgMoldRiskInside = monthlyRiskOfMold(insideData);
-                        double avgMoldRiskOutside = monthlyRiskOfMold(outsideData);
+                        double avgMoldRiskInside = WeatherCalculations.DeligateThis(WeatherCalculations.CalculateAverageMoldRisk, insideData);
+                        double avgMoldRiskOutside = WeatherCalculations.DeligateThis(WeatherCalculations.CalculateAverageMoldRisk, outsideData);
 
 
                         writer.WriteLine($"\t\tDate: {month.Key}");
